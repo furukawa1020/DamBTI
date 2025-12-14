@@ -40,14 +40,23 @@ router.post('/diagnose', (req: Request, res: Response) => {
     });
 });
 
+import { fetchRealtimeDamData } from '../data/realtime_scraper';
+
 // GET /api/dams/:id
-router.get('/dams/:id', (req: Request, res: Response) => {
+router.get('/dams/:id', async (req: Request, res: Response) => {
     const dam = getDamById(req.params.id);
     if (!dam) {
         res.status(404).json({ error: 'Dam not found' });
         return
     }
-    res.json(dam);
+
+    // Fetch Simulated Real-time data
+    const realtime = await fetchRealtimeDamData(dam.name_ja);
+
+    res.json({
+        ...dam,
+        realtime: realtime || {}
+    });
 });
 
 export default router;
