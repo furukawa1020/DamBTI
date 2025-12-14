@@ -1,17 +1,18 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import QuestionCard from './QuestionCard.svelte';
-  import DamResult from './DamResult.svelte'; // We'll make this next
+  import { onMount } from "svelte";
+  import QuestionCard from "./QuestionCard.svelte";
+  import DamResult from "./DamResult.svelte"; // We'll make this next
 
   let questions: any[] = [];
-  let answers: { questionId: string, choiceKey: string }[] = [];
+  let answers: { questionId: string; choiceKey: string }[] = [];
   let currentIdx = 0;
   let loading = true;
   let resultData: any = null;
 
   onMount(async () => {
     try {
-      const res = await fetch('http://localhost:3000/api/questions');
+      const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
+      const res = await fetch(`${apiUrl}/api/questions`);
       questions = await res.json();
       loading = false;
     } catch (e) {
@@ -23,7 +24,7 @@
   async function handleAnswer(event: CustomEvent) {
     const { questionId, choiceKey } = event.detail;
     answers = [...answers, { questionId, choiceKey }];
-    
+
     if (currentIdx < questions.length - 1) {
       currentIdx++;
     } else {
@@ -34,10 +35,11 @@
 
   async function submitDiagnosis() {
     try {
-      const res = await fetch('http://localhost:3000/api/diagnose', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers })
+      const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
+      const res = await fetch(`${apiUrl}/api/diagnose`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers }),
       });
       resultData = await res.json();
     } catch (e) {
@@ -57,8 +59,8 @@
   {:else if resultData}
     <DamResult result={resultData} />
   {:else if questions.length > 0}
-    <QuestionCard 
-      question={questions[currentIdx]} 
+    <QuestionCard
+      question={questions[currentIdx]}
       currentNum={currentIdx + 1}
       totalNum={questions.length}
       on:answer={handleAnswer}
@@ -80,7 +82,7 @@
     justify-content: center;
     color: var(--color-primary);
   }
-  
+
   /* Simple Ripple Animation */
   .ripple {
     width: 60px;
@@ -92,7 +94,13 @@
   }
 
   @keyframes ripple {
-    0% { transform: scale(0.8); opacity: 1; }
-    100% { transform: scale(1.5); opacity: 0; }
+    0% {
+      transform: scale(0.8);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
   }
 </style>

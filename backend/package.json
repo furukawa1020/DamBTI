@@ -4,9 +4,10 @@
   "description": "",
   "main": "dist/api/server.js",
   "scripts": {
-    "start": "ts-node src/api/server.ts",
+    "start": "node dist/api/server.js",
     "dev": "nodemon src/api/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "tsc"
   },
   "keywords": [],
   "author": "",
