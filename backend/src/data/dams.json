@@ -1,0 +1,126 @@
+[
+    {
+        "id": "1",
+        "name_ja": "黒部ダム",
+        "name_en": "Kurobe Dam",
+        "river_name": "黒部川",
+        "prefecture": "富山県",
+        "purposes": [
+            "P"
+        ],
+        "dam_type": "Arch",
+        "total_storage_m3": 199285000,
+        "effective_storage_m3": 148843000,
+        "height_m": 186.0,
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Kurobe_Dam_01.jpg/1200px-Kurobe_Dam_01.jpg",
+        "traits": {
+            "storage": 90,
+            "release": 40,
+            "input": 80,
+            "purpose": 20,
+            "scale": 95,
+            "stability": 80
+        }
+    },
+    {
+        "id": "2",
+        "name_ja": "早明浦ダム",
+        "name_en": "Sameura Dam",
+        "river_name": "吉野川",
+        "prefecture": "高知県",
+        "purposes": [
+            "F",
+            "P",
+            "A",
+            "I"
+        ],
+        "dam_type": "Gravity",
+        "total_storage_m3": 316000000,
+        "effective_storage_m3": 289000000,
+        "height_m": 106.0,
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Sameura_Dam.jpg/1200px-Sameura_Dam.jpg",
+        "traits": {
+            "storage": 85,
+            "release": 70,
+            "input": 60,
+            "purpose": 90,
+            "scale": 90,
+            "stability": 40
+        }
+    },
+    {
+        "id": "3",
+        "name_ja": "宮ヶ瀬ダム",
+        "name_en": "Miyagase Dam",
+        "river_name": "相模川",
+        "prefecture": "神奈川県",
+        "purposes": [
+            "F",
+            "N",
+            "W",
+            "P"
+        ],
+        "dam_type": "Gravity",
+        "total_storage_m3": 193000000,
+        "effective_storage_m3": 183000000,
+        "height_m": 156.0,
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Miyagase_Dam_01.jpg",
+        "traits": {
+            "storage": 80,
+            "release": 60,
+            "input": 50,
+            "purpose": 80,
+            "scale": 85,
+            "stability": 70
+        }
+    },
+    {
+        "id": "4",
+        "name_ja": "徳山ダム",
+        "name_en": "Tokuyama Dam",
+        "river_name": "揖斐川",
+        "prefecture": "岐阜県",
+        "purposes": [
+            "F",
+            "N",
+            "W",
+            "P"
+        ],
+        "dam_type": "Rockfill",
+        "total_storage_m3": 660000000,
+        "effective_storage_m3": 380400000,
+        "height_m": 161.0,
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Tokuyama_Dam_2008.jpg/1200px-Tokuyama_Dam_2008.jpg",
+        "traits": {
+            "storage": 100,
+            "release": 50,
+            "input": 60,
+            "purpose": 85,
+            "scale": 100,
+            "stability": 60
+        }
+    },
+    {
+        "id": "5",
+        "name_ja": "豊平峡ダム",
+        "name_en": "Hoheikyo Dam",
+        "river_name": "豊平川",
+        "prefecture": "北海道",
+        "purposes": [
+            "F",
+            "P"
+        ],
+        "dam_type": "Arch",
+        "total_storage_m3": 47100000,
+        "effective_storage_m3": 37100000,
+        "height_m": 102.5,
+        "traits": {
+            "storage": 60,
+            "release": 40,
+            "input": 50,
+            "purpose": 40,
+            "scale": 60,
+            "stability": 60
+        }
+    }
+]
