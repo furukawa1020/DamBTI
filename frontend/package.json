@@ -1,0 +1,19 @@
+{
+    "name": "dambti-frontend",
+    "type": "module",
+    "version": "0.0.1",
+    "scripts": {
+        "dev": "astro dev",
+        "start": "astro dev",
+        "build": "astro build",
+        "preview": "astro preview",
+        "astro": "astro"
+    },
+    "dependencies": {
+        "@astrojs/check": "^0.9.4",
+        "@astrojs/svelte": "^5.7.3",
+        "astro": "^4.15.9",
+        "svelte": "^4.2.19",
+        "typescript": "^5.6.2"
+    }
+}
