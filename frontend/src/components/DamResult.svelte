@@ -122,12 +122,44 @@
     font-size: 0.9rem;
   }
 
+  .result-container {
+    padding: 2rem;
+    overflow-y: auto;
+    color: #333; /* Force dark text for the whole result container */
+  }
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #333; /* Ensure tags text is readable if outside */
+  }
+  .tag {
+    background: var(--color-primary);
+    color: white; /* Tag text itself is white on blue */
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.9rem;
+  }
+
   .main-dam {
     background: #f8f9fa;
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 2rem;
     text-align: center;
+    color: #333; /* Strictly dark text on white bg */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Add shadow for depth in dark mode */
   }
 
   .img-wrapper {
