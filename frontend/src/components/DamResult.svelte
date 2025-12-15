@@ -4,9 +4,12 @@
   const { typeTags, mainDam, subDams } = result;
 
   function handleShare() {
-    const text = `私のダムBTI診断結果は...『${mainDam.name_ja}』タイプ（${typeTags[0]}）でした！\n\n全国のダムからあなたの性格を診断 #ダムBTI\n`;
-    const url = window.location.href; // Or the deployed URL if known
-    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    // Enrich the share text with tags to capture the "characteristics"
+    const tagsStr = typeTags.map((t: string) => `#${t}`).join(" ");
+    // Example: "My DamBTI is Kurobe Dam! Features: #Huge #Discharge"
+    const text = `私のダムBTI診断結果は...『${mainDam.name_ja}』タイプでした！\n\n【特徴】\n${tagsStr}\n\n全国のダムからあなたの性格を診断\n`;
+    const url = window.location.href;
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=ダムBTI,ダムタイプ診断`;
     window.open(shareUrl, "_blank");
   }
 </script>
