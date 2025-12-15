@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node dist/api/server.js",
     "dev": "nodemon src/api/server.ts",
-    "build": "tsc",
-    "postinstall": "tsc"
+    "build": "tsc && cp src/data/*.json dist/data/",
+    "postinstall": "npm run build"
   },
   "keywords": [],
   "author": "",
