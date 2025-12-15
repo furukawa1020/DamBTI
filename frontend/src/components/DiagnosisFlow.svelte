@@ -55,26 +55,35 @@
 </script>
 
 <div class="container">
-  {#if !started}
     <div class="landing">
       <div class="hero-content">
-        <h1>ダムBTI</h1>
-        <p class="subtitle">Dam Based Type Indicator</p>
+        <h1 class="glitch" data-text="ダムBTI">ダムBTI</h1>
+        <p class="subtitle">DAM BASED TYPE INDICATOR</p>
+        
+        <div class="warning-box">
+          <span class="icon">⚠️</span>
+          <span>INTERNAL PRESSURE CRITICAL</span>
+          <span class="icon">⚠️</span>
+        </div>
+
         <p class="description">
-          あなたの性格を全国の『ダム』に例えて診断します。<br />
-          放流のクセ、堤体の重厚感、貯水容量...<br />
-          18の質問から、あなたに最も近いダム構造を科学的に分析。
+          <span class="highlight">「あなたの心は何㎥ですか？」</span><br><br>
+          コンクリートの塊に、己の魂を投影せよ。<br>
+          放流の轟音、圧倒的質量、静寂なる水面...。<br>
+          <br>
+          全3000基のデータが、あなたの<span class="danger">「決壊」</span>を待っている。
         </p>
-        <button class="start-btn" on:click={startDiagnosis}
-          >診断を開始する</button
-        >
-        <p class="meta">所要時間：約2分 | 完全無料</p>
+        <button class="start-btn" on:click={startDiagnosis}>
+          <span class="btn-text">ゲートを開放する</span>
+          <span class="btn-sub">START DIAGNOSIS</span>
+        </button>
+        <p class="meta">※放流注意 | 水濡れ厳禁</p>
       </div>
     </div>
   {:else if loading && !resultData}
     <div class="loading">
-      <div class="ripple"></div>
-      <p>ダムを探しています...</p>
+      <div class="siren"></div>
+      <p>ダムデータ照合中...<br><span class="blink">CRITICAL ERROR: TOO MUCH CONCRETE</span></p>
     </div>
   {:else if resultData}
     <DamResult result={resultData} />
@@ -93,36 +102,39 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    background: #2b2b2b; /* Concrete dark */
+    color: #f0f0f0;
   }
+  
+  /* Loading Madness */
   .loading {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: var(--color-primary);
+    background: repeating-linear-gradient(
+      45deg,
+      #2b2b2b,
+      #2b2b2b 10px,
+      #333 10px,
+      #333 20px
+    );
   }
-
-  /* Simple Ripple Animation */
-  .ripple {
-    width: 60px;
-    height: 60px;
-    border: 4px solid var(--color-primary);
+  .siren {
+    width: 80px;
+    height: 80px;
+    border: 5px solid #ffcc00; /* Warning Yellow */
+    border-top: 5px solid red;
     border-radius: 50%;
-    animation: ripple 1.5s infinite;
-    margin-bottom: 1rem;
+    animation: spin 0.5s linear infinite;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 20px red;
   }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  .blink { animation: blink 0.2s infinite; color: red; font-weight: bold; }
+  @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
 
-  @keyframes ripple {
-    0% {
-      transform: scale(0.8);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(1.5);
-      opacity: 0;
-    }
-  }
   /* Landing Styles */
   .landing {
     flex: 1;
@@ -132,48 +144,101 @@
     justify-content: center;
     text-align: center;
     padding: 2rem;
-    background: linear-gradient(to bottom, #f0f4ff, #fff);
+    background: 
+      linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+      url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Kurobe_Dam_Toyama_Japan.jpg/1200px-Kurobe_Dam_Toyama_Japan.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
   }
-  .hero-content h1 {
-    font-size: 3rem;
-    color: var(--color-primary);
+
+  .glitch {
+    font-size: 5rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 2px 2px 0px #ff0000, -2px -2px 0px #00ffff;
+    letter-spacing: -5px;
     margin: 0;
-    line-height: 1.2;
   }
+  
   .subtitle {
-    font-size: 1rem;
-    color: #666;
-    letter-spacing: 0.1em;
+    font-size: 1.2rem;
+    color: #ffcc00; /* Warning Yellow */
+    letter-spacing: 0.5em;
     margin-bottom: 2rem;
     font-weight: bold;
+    border-bottom: 2px solid #ffcc00;
+    padding-bottom: 0.5rem;
   }
-  .description {
-    font-size: 1rem;
-    color: #444;
-    line-height: 1.8;
-    margin-bottom: 3rem;
-  }
-  .start-btn {
-    background: var(--color-primary);
-    color: white;
-    font-size: 1.2rem;
+
+  .warning-box {
+    background: #ffcc00;
+    color: black;
     font-weight: bold;
-    padding: 1rem 3rem;
-    border: none;
-    border-radius: 50px;
+    padding: 0.5rem 2rem;
+    transform: skewX(-10deg);
+    margin-bottom: 2rem;
+    border: 2px solid black;
+    box-shadow: 5px 5px 0px black;
+  }
+
+  .description {
+    font-size: 1.1rem;
+    color: #eee;
+    line-height: 2;
+    margin-bottom: 3rem;
+    font-family: "Noto Sans JP", sans-serif;
+  }
+  
+  .highlight {
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: white;
+    color: black;
+    padding: 0.2rem 1rem;
+  }
+  
+  .danger {
+    color: #ff3333;
+    font-weight: 900;
+    font-size: 1.2rem;
+  }
+
+  .start-btn {
+    background: #ff3333; /* Emergency Red */
+    color: white;
+    border: 4px solid white;
+    padding: 1rem 4rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 100, 255, 0.3);
-    transition:
-      transform 0.2s,
-      box-shadow 0.2s;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+    transition: all 0.1s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .start-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 100, 255, 0.4);
+    transform: scale(1.05);
+    background: red;
+    box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
   }
+  .start-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .btn-text {
+    font-size: 1.8rem;
+    font-weight: 900;
+  }
+  .btn-sub {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    opacity: 0.8;
+  }
+
   .meta {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     font-size: 0.8rem;
     color: #888;
+    font-family: monospace;
   }
 </style>
