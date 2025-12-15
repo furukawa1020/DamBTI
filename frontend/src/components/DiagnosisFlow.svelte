@@ -55,11 +55,12 @@
 </script>
 
 <div class="container">
+  {#if !started}
     <div class="landing">
       <div class="hero-content">
         <h1 class="glitch" data-text="ダムBTI">ダムBTI</h1>
         <p class="subtitle">DAM BASED TYPE INDICATOR</p>
-        
+
         <div class="warning-box">
           <span class="icon">⚠️</span>
           <span>INTERNAL PRESSURE CRITICAL</span>
@@ -67,11 +68,13 @@
         </div>
 
         <p class="description">
-          <span class="highlight">「あなたの心は何㎥ですか？」</span><br><br>
-          コンクリートの塊に、己の魂を投影せよ。<br>
-          放流の轟音、圧倒的質量、静寂なる水面...。<br>
-          <br>
-          全3000基のデータが、あなたの<span class="danger">「決壊」</span>を待っている。
+          <span class="highlight">「あなたの心は何㎥ですか？」</span><br /><br
+          />
+          コンクリートの塊に、己の魂を投影せよ。<br />
+          放流の轟音、圧倒的質量、静寂なる水面...。<br />
+          <br />
+          全3000基のデータが、あなたの<span class="danger">「決壊」</span
+          >を待っている。
         </p>
         <button class="start-btn" on:click={startDiagnosis}>
           <span class="btn-text">ゲートを開放する</span>
@@ -83,7 +86,11 @@
   {:else if loading && !resultData}
     <div class="loading">
       <div class="siren"></div>
-      <p>ダムデータ照合中...<br><span class="blink">CRITICAL ERROR: TOO MUCH CONCRETE</span></p>
+      <p>
+        ダムデータ照合中...<br /><span class="blink"
+          >CRITICAL ERROR: TOO MUCH CONCRETE</span
+        >
+      </p>
     </div>
   {:else if resultData}
     <DamResult result={resultData} />
@@ -105,7 +112,7 @@
     background: #2b2b2b; /* Concrete dark */
     color: #f0f0f0;
   }
-  
+
   /* Loading Madness */
   .loading {
     flex: 1;
@@ -131,9 +138,30 @@
     margin-bottom: 2rem;
     box-shadow: 0 0 20px red;
   }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  .blink { animation: blink 0.2s infinite; color: red; font-weight: bold; }
-  @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  .blink {
+    animation: blink 0.2s infinite;
+    color: red;
+    font-weight: bold;
+  }
+  @keyframes blink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 
   /* Landing Styles */
   .landing {
@@ -144,9 +172,9 @@
     justify-content: center;
     text-align: center;
     padding: 2rem;
-    background: 
-      linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
-      url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Kurobe_Dam_Toyama_Japan.jpg/1200px-Kurobe_Dam_Toyama_Japan.jpg');
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+      url("https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Kurobe_Dam_Toyama_Japan.jpg/1200px-Kurobe_Dam_Toyama_Japan.jpg");
     background-size: cover;
     background-position: center;
     color: white;
@@ -156,11 +184,13 @@
     font-size: 5rem;
     font-weight: 900;
     color: #fff;
-    text-shadow: 2px 2px 0px #ff0000, -2px -2px 0px #00ffff;
+    text-shadow:
+      2px 2px 0px #ff0000,
+      -2px -2px 0px #00ffff;
     letter-spacing: -5px;
     margin: 0;
   }
-  
+
   .subtitle {
     font-size: 1.2rem;
     color: #ffcc00; /* Warning Yellow */
@@ -189,7 +219,7 @@
     margin-bottom: 3rem;
     font-family: "Noto Sans JP", sans-serif;
   }
-  
+
   .highlight {
     font-size: 1.5rem;
     font-weight: bold;
@@ -197,7 +227,7 @@
     color: black;
     padding: 0.2rem 1rem;
   }
-  
+
   .danger {
     color: #ff3333;
     font-weight: 900;
@@ -224,7 +254,7 @@
   .start-btn:active {
     transform: scale(0.95);
   }
-  
+
   .btn-text {
     font-size: 1.8rem;
     font-weight: 900;
