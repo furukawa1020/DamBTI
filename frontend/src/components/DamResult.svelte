@@ -2,6 +2,13 @@
   export let result: any;
 
   const { typeTags, mainDam, subDams } = result;
+
+  function handleShare() {
+    const text = `私のダムBTI診断結果は...『${mainDam.name_ja}』タイプ（${typeTags[0]}）でした！\n\n全国のダムからあなたの性格を診断 #ダムBTI\n`;
+    const url = window.location.href; // Or the deployed URL if known
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(shareUrl, '_blank');
+  }
 </script>
 
 <div class="result-container">
@@ -76,11 +83,24 @@
   </section>
 
   <div class="actions">
-    <button class="share">Xで共有する</button>
-    <button class="retry" on:click={() => location.reload()}
-      >もう一度ととのう</button
-    >
+    <button class="share" on:click={handleShare}>Xで共有する</button>
+    <button class="retry" on:click={() => location.reload()}>もう一度ととのう</button>
   </div>
+</div>
+
+<script lang="ts">
+  // Move script logic here is clumsy in Svelte inside HTML block, 
+  // but we can add the function to the top <script> block and reference it.
+  // Wait, I should have added the function in the top block.
+  // Let me re-write this block to just call the function, 
+  // and I will use a separate replacement to add the function definition at the top.
+</script>
+<!-- Retrying the replace logic to be cleaner. I will only update the button HTML here. -->
+<!-- Wait, I need to add the function to the <script> block first. I'll utilize the previous turn's context. -->
+<!-- Actually, let's just do it all in the top script block with a separate tool call if needed. -->
+<!-- I'll do the button update here and the script update in the next tool call for safety. -->
+<!-- No, I can do it in one go if I target the right place. But `DamResult.svelte` has the script at the top. -->
+<!-- Let's update the Script block first. -->
 </div>
 
 <style>
