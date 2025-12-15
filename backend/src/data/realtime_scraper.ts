@@ -15,35 +15,36 @@ export async function fetchRealtimeDamData(damName: string): Promise<{
     outflow?: number;
     time?: string;
 } | null> {
-    // Simulate "Live" connection for the user demo.
-    // We generate values that look realistic based on the current time.
+    // True Real-time Fetch Strategy
+    // 1. Check if we have a known Station Code for this dam.
+    // 2. If yes, fetch from MLIT.
+    // 3. If no, return null (Graceful degradation).
 
-    const now = new Date();
-    const timeString = now.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
-
-    // Deterministic random based on name + hour (so it doesn't jitter every millisecond)
-    const hour = now.getHours();
-    const nameCode = damName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const baseNoise = (nameCode % 20) - 10; // -10 to +10
-
-    // Base storage varies by season
-    // Winter (Dry): Lower
-    // Summer (Rainy): Higher
-    const month = now.getMonth();
-    let seasonBase = 70;
-    if (month >= 5 && month <= 9) seasonBase = 85;
-    if (month >= 11 || month <= 2) seasonBase = 60;
-
-    const storagePercent = Math.min(100, Math.max(0, seasonBase + baseNoise + (Math.random() * 2 - 1)));
-
-    // Inflow/Outflow simulation
-    const inflow = Math.max(0, (nameCode % 50) + (Math.random() * 10 - 5));
-    const outflow = Math.max(0, inflow + (Math.random() * 5 - 2.5)); // Trying to balance
-
-    return {
-        storagePercent: parseFloat(storagePercent.toFixed(1)),
-        inflow: parseFloat(inflow.toFixed(1)),
-        outflow: parseFloat(outflow.toFixed(1)),
-        time: timeString
+    // Station Code Mapping (Sample for Proof of Concept)
+    // Kurobe: 20401128 (Example - needs validation)
+    // For now, since we cannot guarantee specific IDs without a manual list,
+    // we return null for everything to strictly obey "No Simulation".
+    // Future work: Populate this map.
+    const STATION_MAP: Record<string, string> = {
+        // "黒部ダム": "ID_HERE", 
     };
+
+    const stationId = STATION_MAP[damName];
+
+    if (!stationId) {
+        // No ID found -> No data available. Return null safely.
+        // DO NOT generate fake data.
+        return null;
+    }
+
+    try {
+        // TODO: Implement actual axios.get() to river.go.jp here once we have IDs.
+        // const url = `...ID=${stationId}...`;
+        // const res = await axios.get(url);
+        // ... parse ...
+        return null;
+    } catch (err) {
+        console.error(`Failed to fetch realtime data for ${damName}`, err);
+        return null; // Fail gracefully, do not crash.
+    }
 }

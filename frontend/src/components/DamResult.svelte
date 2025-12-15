@@ -1,6 +1,6 @@
 <script lang="ts">
   export let result: any;
-  
+
   const { typeTags, mainDam, subDams } = result;
 </script>
 
@@ -24,7 +24,7 @@
     <div class="info">
       <p>所在地: {mainDam.prefecture}</p>
       {#if mainDam.dam_type}<p>形式: {mainDam.dam_type}</p>{/if}
-      
+
       <!-- Basic Stats -->
       <div class="stats">
         <div class="stat">
@@ -35,6 +35,33 @@
           <label>総貯水</label>
           <span>{(mainDam.total_storage_m3 / 10000).toLocaleString()}万m³</span>
         </div>
+      </div>
+
+      <!-- Real-time Status (Only if available) -->
+      <div class="realtime-status">
+        <h3>現在のダムの様子</h3>
+        {#if mainDam.realtime}
+          <div class="status-grid">
+            <div class="status-item">
+              <label>貯水率</label>
+              <span class="value">{mainDam.realtime.storagePercent}%</span>
+            </div>
+            <div class="status-item">
+              <label>流入量</label>
+              <span class="value">{mainDam.realtime.inflow} m³/s</span>
+            </div>
+            <div class="status-item">
+              <label>放流量</label>
+              <span class="value">{mainDam.realtime.outflow} m³/s</span>
+            </div>
+          </div>
+          <p class="timestamp">更新: {mainDam.realtime.time}</p>
+        {:else}
+          <div class="no-data">
+            <p>現在、リアルタイム情報は取得できません。</p>
+            <p class="sub-text">（国土交通省の観測所コードが未連携のため）</p>
+          </div>
+        {/if}
       </div>
     </div>
   </section>
@@ -50,7 +77,9 @@
 
   <div class="actions">
     <button class="share">Xで共有する</button>
-    <button class="retry" on:click={() => location.reload()}>もう一度ととのう</button>
+    <button class="retry" on:click={() => location.reload()}
+      >もう一度ととのう</button
+    >
   </div>
 </div>
 
@@ -63,8 +92,12 @@
     text-align: center;
     margin-bottom: 2rem;
   }
-  h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--color-primary); }
-  
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+  }
+
   .tags {
     display: flex;
     flex-wrap: wrap;
@@ -112,8 +145,14 @@
     display: flex;
     flex-direction: column;
   }
-  .stat label { font-size: 0.8rem; color: #666; }
-  .stat span { font-weight: bold; font-size: 1.1rem; }
+  .stat label {
+    font-size: 0.8rem;
+    color: #666;
+  }
+  .stat span {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
 
   .sub-dams {
     font-size: 0.9rem;
@@ -142,6 +181,13 @@
     border-radius: 8px;
     font-weight: bold;
   }
-  .share { background: black; color: white; }
-  .retry { background: white; border: 1px solid #ccc; color: #666; }
+  .share {
+    background: black;
+    color: white;
+  }
+  .retry {
+    background: white;
+    border: 1px solid #ccc;
+    color: #666;
+  }
 </style>
