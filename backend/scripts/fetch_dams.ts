@@ -6,14 +6,8 @@ import path from 'path';
 const ENDPOINT = 'https://query.wikidata.org/sparql';
 
 // Query for Dams in Japan
-// P31: Instance of -> Q12323 (Dam)
-// P17: Country -> Q17 (Japan)
-// P2048: Height
-// P2234: Volume (Capacity)
-// P18: Image
-// P131: Admin Entity (Prefecture)
 const QUERY = `
-SELECT ?dam ?damLabel ?height ?volume ?image ?prefectureLabel ?coords WHERE {
+SELECT ?dam ?damLabel ?height ?volume ?image ?prefectureLabel ?typeLabel WHERE {
   ?dam wdt:P31/wdt:P279* wd:Q12323;
        wdt:P17 wd:Q17.
   
@@ -21,11 +15,11 @@ SELECT ?dam ?damLabel ?height ?volume ?image ?prefectureLabel ?coords WHERE {
   OPTIONAL { ?dam wdt:P1083 ?volume. } 
   OPTIONAL { ?dam wdt:P18 ?image. }
   OPTIONAL { ?dam wdt:P131 ?prefecture. }
-  OPTIONAL { ?dam wdt:P625 ?coords. }
+  OPTIONAL { ?dam wdt:P31 ?type. }
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "ja,en". }
 }
-LIMIT 3000
+LIMIT 4000
 `;
 
 async function fetchDams() {
@@ -39,21 +33,32 @@ async function fetchDams() {
         const data = await res.json();
         const bindings = data.results.bindings;
 
-        console.log(`Found ${bindings.length} dams.`);
+        console.log(`Found ${bindings.length} rows.`);
 
-        // Transform to DamBTI format
-        const transformed = bindings.map((b: any) => {
+        // Helper to aggregate types by ID
+        const damMap = new Map<string, any>();
+
+        bindings.forEach((b: any) => {
+            const id = b.dam.value.split('/').pop();
+            const typeName = b.typeLabel ? b.typeLabel.value : '不明';
+
+            if (damMap.has(id)) {
+                // Aggregate type if new
+                const existing = damMap.get(id);
+                // If existing is "不明" and we found a real type, overwrite it
+                if (existing.dam_type === '不明' && typeName !== 'ダム' && typeName !== '不明') {
+                    existing.dam_type = typeName;
+                } else if (!existing.dam_type.includes(typeName) && typeName !== 'ダム' && typeName !== '不明') {
+                    // Otherwise append unique real types
+                    existing.dam_type += `・${typeName}`;
+                }
+                return;
+            }
+
             // Basic traits estimation since Wikidata might lack functional details like "Purpose"
             // We will randomize or estimate based on available metrics
             const height = b.height ? parseFloat(b.height.value) : 50;
             const volume = b.volume ? parseFloat(b.volume.value) : 1000000;
-
-            // Enhanced heuristics for DamBTI
-            // 1. Release (Output): High if it has large gates or flood control. 
-            //    Since we lack gate data, use Height/Volume ratio (Flashy = High, Stable = Low) or Random hash.
-            // 2. Input (Response): High if small catchment or multi-purpose.
-            // 3. Stability: High if Volume is huge relative to Height (Gravity/Rockfill-ish).
-            // 4. Purpose: High for Multi-purpose, Low for single purpose.
 
             // Deterministic hash for consistent "Personality" across fetches
             const nameHash = b.damLabel.value.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
@@ -86,18 +91,20 @@ async function fetchDams() {
                 stability: Math.max(0, Math.min(100, stabilityScore))
             };
 
-            return {
-                id: b.dam.value.split('/').pop(),
+            damMap.set(id, {
+                id: id,
                 name_ja: b.damLabel.value,
                 prefecture: b.prefectureLabel ? b.prefectureLabel.value : '日本',
                 total_storage_m3: volume,
                 height_m: height,
                 imageUrl: b.image ? b.image.value : undefined,
-                purposes: ['M'], // Unknown from this query, default to Multi
-                dam_type: 'Unknown',
+                purposes: ['M'],
+                dam_type: (typeName === 'ダム' || !typeName) ? '不明' : typeName,
                 traits
-            };
+            });
         });
+
+        const transformed = Array.from(damMap.values());
 
         // Filter broken data (e.g. QIDs as names)
         const valid = transformed.filter((d: any) => !d.name_ja.startsWith('Q'));
