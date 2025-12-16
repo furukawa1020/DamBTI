@@ -42,6 +42,13 @@ router.post('/diagnose', (req: Request, res: Response) => {
 
 import { fetchRealtimeDamData } from '../data/realtime_scraper';
 
+// GET /api/dams
+router.get('/dams', (req: Request, res: Response) => {
+    const dams = loadDams();
+    // 3000 items is ~1MB JSON, acceptable for single fetch on a "Database" page.
+    res.json(dams);
+});
+
 // GET /api/dams/:id
 router.get('/dams/:id', async (req: Request, res: Response) => {
     const dam = getDamById(req.params.id);

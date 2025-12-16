@@ -81,6 +81,10 @@
           <span class="btn-sub">START DIAGNOSIS</span>
         </button>
         <p class="meta">※放流注意 | 水濡れ厳禁</p>
+
+        <div class="db-link">
+          <a href="/list">全3000基のダムデータベースを見る &rarr;</a>
+        </div>
       </div>
     </div>
   {:else if loading && !resultData}
@@ -270,5 +274,21 @@
     font-size: 0.8rem;
     color: #888;
     font-family: monospace;
+  }
+
+  .db-link {
+    margin-top: 2rem;
+  }
+  .db-link a {
+    color: #ccc;
+    text-decoration: none;
+    border-bottom: 1px solid #666;
+    padding-bottom: 2px;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  .db-link a:hover {
+    color: #ffcc00;
+    border-color: #ffcc00;
   }
 </style>

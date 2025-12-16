@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+import DamList from '../components/DamList.svelte';
+---
+
+<Layout title="全ダムデータベース | ダムBTI">
+	<main>
+		<DamList client:load />
+	</main>
+</Layout>
+
+<style>
+	main {
+		min-height: 100vh;
+		background: #f4f4f4;
+	}
+</style>
