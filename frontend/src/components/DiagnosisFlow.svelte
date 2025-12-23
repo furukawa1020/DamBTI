@@ -72,7 +72,7 @@
           コンクリートの塊に、己の魂を投影せよ。<br />
           放流の轟音、圧倒的質量、静寂なる水面...。<br />
           <br />
-          全3000基のデータが、あなたの<span class="danger">「決壊」</span>を待っている。
+          全2200基以上のデータが、あなたの<span class="danger">「決壊」</span>を待っている。
         </p>
         <button class="start-btn" on:click={startDiagnosis}>
           <span class="btn-text">ゲートを開放する</span>
@@ -81,7 +81,7 @@
         <p class="meta">※放流注意 | 水濡れ厳禁</p>
 
         <div class="db-link">
-          <a href="/list">全3000基のダムデータベースを見る &rarr;</a>
+          <a href="/list">全2200基以上のダムデータベースを見る &rarr;</a>
         </div>
       </div>
     </div>
