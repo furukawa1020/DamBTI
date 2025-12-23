@@ -68,13 +68,11 @@
         </div>
 
         <p class="description">
-          <span class="highlight">「あなたの心は何㎥ですか？」</span><br /><br
-          />
+          <span class="highlight">「あなたの心は何㎥ですか？」</span><br /><br />
           コンクリートの塊に、己の魂を投影せよ。<br />
           放流の轟音、圧倒的質量、静寂なる水面...。<br />
           <br />
-          全3000基のデータが、あなたの<span class="danger">「決壊」</span
-          >を待っている。
+          全3000基のデータが、あなたの<span class="danger">「決壊」</span>を待っている。
         </p>
         <button class="start-btn" on:click={startDiagnosis}>
           <span class="btn-text">ゲートを開放する</span>
@@ -230,6 +228,7 @@
     background: white;
     color: black;
     padding: 0.2rem 1rem;
+    white-space: nowrap;
   }
 
   .danger {
