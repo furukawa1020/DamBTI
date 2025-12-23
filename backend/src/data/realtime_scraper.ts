@@ -274,12 +274,98 @@ async function fetchFromWaterResources(damCode: string): Promise<DamRealtimeData
         return null;
     }
 }
+// 国交省ダム諸量データベースからデータを取得
+async function fetchFromMLIT(damName: string): Promise<DamRealtimeData | null> {
     try {
-        // 国交省ダム諸量データベースのURL
-        const url = `http://www1.river.go.jp/cgi/DamData/DamDataSyuten.exe?ID=${damCode}`;
-        
-        const response = await axios.get(url, {
-            timeout: 5000,
+        // 国交省の各地方整備局のダムデータページを試行
+        const urls = [
+            `http://www1.river.go.jp/cgi-bin/DamData/dam_data.cgi?dam=${encodeURIComponent(damName)}`,
+            `http://www.river.go.jp/kawabou/ipDamData.do?init=init&obsrvId=${encodeURIComponent(damName)}`,
+        ];
+
+        for (const url of urls) {
+            try {
+                const response = await axios.get(url, {
+                    timeout: 8000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+
+                const $ = cheerio.load(response.data);
+                
+                let storagePercent: number | undefined;
+                let inflow: number | undefined;
+                let outflow: number | undefined;
+                let time: string | undefined;
+
+                // テーブルからデータを抽出
+                $('table tr, table.data tr').each((i, row) => {
+                    const cells = $(row).find('td, th');
+                    cells.each((j, cell) => {
+                        const text = $(cell).text().trim();
+                        const nextCell = cells.eq(j + 1);
+                        const value = nextCell.text().trim();
+
+                        if (text.includes('貯水率') || text.includes('貯水位')) {
+                            const match = value.match(/(\d+\.?\d*)/);
+                            if (match) storagePercent = parseFloat(match[1]);
+                        } else if (text.includes('流入量')) {
+                            const match = value.match(/(\d+\.?\d*)/);
+                            if (match) inflow = parseFloat(match[1]);
+                        } else if (text.includes('放流量') || text.includes('全放流')) {
+                            const match = value.match(/(\d+\.?\d*)/);
+                            if (match && outflow === undefined) outflow = parseFloat(match[1]);
+                        }
+                    });
+                });
+
+                // 更新時刻を抽出
+                const bodyText = $('body').text();
+                const timeMatch = bodyText.match(/(\d{4})[\/-年](\d{1,2})[\/-月](\d{1,2})[日\s]*(\d{1,2}):(\d{2})/);
+                if (timeMatch) {
+                    time = `${timeMatch[1]}-${timeMatch[2].padStart(2, '0')}-${timeMatch[3].padStart(2, '0')} ${timeMatch[4].padStart(2, '0')}:${timeMatch[5]}`;
+                }
+
+                if (storagePercent !== undefined || inflow !== undefined || outflow !== undefined) {
+                    return { storagePercent, inflow, outflow, time };
+                }
+            } catch (err) {
+                // このURLでは取得できなかったので次を試す
+                continue;
+            }
+        }
+
+        return null;
+    } catch (err) {
+        console.error(`Failed to fetch from MLIT for ${damName}:`, err);
+        return null;
+    }
+}
+
+// 電力会社の公開データから取得（主要な電力ダム）
+async function fetchFromPowerCompany(damName: string): Promise<DamRealtimeData | null> {
+    try {
+        const powerDams: Record<string, { company: string; url: string }> = {
+            '黒部ダム': { 
+                company: 'kepco', 
+                url: 'https://www.kepco.co.jp/energy_supply/energy/newenergy/water/kurobe/'
+            },
+            '奥只見ダム': { 
+                company: 'jpower', 
+                url: 'http://www.jpower.co.jp/bs/karyoku/dambinran/detail/okutadami.html'
+            },
+            '田子倉ダム': { 
+                company: 'jpower', 
+                url: 'http://www.jpower.co.jp/bs/karyoku/dambinran/detail/tagokura.html'
+            },
+        };
+
+        const damInfo = powerDams[damName];
+        if (!damInfo) return null;
+
+        const response = await axios.get(damInfo.url, {
+            timeout: 10000,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
@@ -287,100 +373,60 @@ async function fetchFromWaterResources(damCode: string): Promise<DamRealtimeData
 
         const $ = cheerio.load(response.data);
         
-        // データを抽出（サイトの構造に応じて調整が必要）
         let storagePercent: number | undefined;
-        let inflow: number | undefined;
-        let outflow: number | undefined;
         let time: string | undefined;
 
-        // 貯水率を抽出
-        $('table tr').each((i, row) => {
-            const cells = $(row).find('td');
-            const label = cells.eq(0).text().trim();
-            
-            if (label.includes('貯水率') || label.includes('貯水位')) {
-                const value = cells.eq(1).text().trim();
-                const match = value.match(/(\d+\.?\d*)/);
-                if (match) {
-                    storagePercent = parseFloat(match[1]);
-                }
-            } else if (label.includes('流入量')) {
-                const value = cells.eq(1).text().trim();
-                const match = value.match(/(\d+\.?\d*)/);
-                if (match) {
-                    inflow = parseFloat(match[1]);
-                }
-            } else if (label.includes('放流量') || label.includes('全放流量')) {
-                const value = cells.eq(1).text().trim();
-                const match = value.match(/(\d+\.?\d*)/);
-                if (match) {
-                    outflow = parseFloat(match[1]);
-                }
+        // 電力会社のサイトは通常、貯水率程度しか公開していない
+        $('.dam-data, .realtime-data, table').each((i, elem) => {
+            const text = $(elem).text();
+            const percentMatch = text.match(/貯水率[：:]\s*(\d+\.?\d*)%/);
+            if (percentMatch) {
+                storagePercent = parseFloat(percentMatch[1]);
             }
         });
 
-        // 更新時刻を抽出
-        const timeText = $('body').text();
-        const timeMatch = timeText.match(/(\d{4})年(\d{1,2})月(\d{1,2})日\s*(\d{1,2}):(\d{2})/);
+        const bodyText = $('body').text();
+        const timeMatch = bodyText.match(/(\d{4})[\/-年](\d{1,2})[\/-月](\d{1,2})[日\s]*(\d{1,2}):(\d{2})/);
         if (timeMatch) {
             time = `${timeMatch[1]}-${timeMatch[2].padStart(2, '0')}-${timeMatch[3].padStart(2, '0')} ${timeMatch[4].padStart(2, '0')}:${timeMatch[5]}`;
         }
 
-        if (storagePercent !== undefined || inflow !== undefined || outflow !== undefined) {
-            return { storagePercent, inflow, outflow, time };
+        if (storagePercent !== undefined) {
+            return { storagePercent, time };
         }
 
         return null;
     } catch (err) {
-        console.error(`Failed to fetch from MLIT for dam code ${damCode}:`, err);
+        console.error(`Failed to fetch from power company for ${damName}:`, err);
         return null;
     }
 }
 
-// 代替データソース：ランダムだがリアルな範囲のデータを生成
-function generateRealisticData(damName: string): DamRealtimeData {
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    
-    // 季節による変動（梅雨・台風期は高め、冬は低め）
-    const seasonalFactor = (month >= 6 && month <= 9) ? 1.2 : 0.8;
-    
-    // ダム名から決定論的なシード値を生成
-    const seed = damName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const pseudoRandom = (seed * 9301 + 49297) % 233280 / 233280;
-    
-    const baseStorage = 60 + (pseudoRandom * 30 - 15) * seasonalFactor; // 45-75%程度
-    const storagePercent = Math.max(20, Math.min(95, baseStorage));
-    
-    const baseInflow = 10 + pseudoRandom * 40 * seasonalFactor; // 変動させる
-    const inflow = Math.max(0.5, baseInflow);
-    
-    const baseOutflow = inflow * (0.7 + pseudoRandom * 0.4); // 流入の70-110%程度
-    const outflow = Math.max(0.3, baseOutflow);
-    
-    return {
-        storagePercent: Math.round(storagePercent * 10) / 10,
-        inflow: Math.round(inflow * 10) / 10,
-        outflow: Math.round(outflow * 10) / 10,
-        time: now.toISOString().slice(0, 16).replace('T', ' ')
-    };
-}
-
 export async function fetchRealtimeDamData(damName: string): Promise<DamRealtimeData | null> {
-    const damCode = DAM_CODE_MAP[damName];
-
-    if (!damCode) {
-        // マッピングにないダムは、リアルなデータを生成
-        return generateRealisticData(damName);
-    }
-
-    // 国交省から実データを取得
-    const mlitData = await fetchFromMLIT(damCode);
+    // 複数のデータソースを順番に試行
     
-    if (mlitData) {
-        return mlitData;
+    // 1. 川の防災情報API（最も信頼性が高い）
+    const riverInfo = RIVER_INFO_MAP[damName];
+    if (riverInfo) {
+        const data = await fetchFromRiverInfo(riverInfo.obsrvtnId);
+        if (data) return data;
     }
 
-    // 取得失敗時はリアルなデータを生成
-    return generateRealisticData(damName);
+    // 2. 水資源機構のデータ
+    const waterResourcesCode = WATER_RESOURCES_MAP[damName];
+    if (waterResourcesCode) {
+        const data = await fetchFromWaterResources(waterResourcesCode);
+        if (data) return data;
+    }
+
+    // 3. 国交省ダム諸量データベース
+    const mlitData = await fetchFromMLIT(damName);
+    if (mlitData) return mlitData;
+
+    // 4. 電力会社の公開データ
+    const powerData = await fetchFromPowerCompany(damName);
+    if (powerData) return powerData;
+
+    // すべてのデータソースで取得できなかった場合はnullを返す
+    return null;
 }
