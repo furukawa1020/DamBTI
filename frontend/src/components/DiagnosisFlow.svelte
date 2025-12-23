@@ -261,6 +261,7 @@
   .btn-text {
     font-size: 1.8rem;
     font-weight: 900;
+    white-space: nowrap;
   }
   .btn-sub {
     font-size: 0.7rem;
