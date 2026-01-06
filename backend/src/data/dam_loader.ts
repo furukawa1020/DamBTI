@@ -13,12 +13,18 @@ export function loadDams(): DamData[] {
     try {
         // Try full list first
         if (fs.existsSync(FULL_DAMS_FILE)) {
-            const data = fs.readFileSync(FULL_DAMS_FILE, 'utf-8');
+            let data = fs.readFileSync(FULL_DAMS_FILE, 'utf-8');
+            // Remove BOM if present
+            data = data.replace(/^\uFEFF/, '');
             cachedDams = JSON.parse(data);
         } else {
-            const data = fs.readFileSync(DAMS_FILE, 'utf-8');
+            let data = fs.readFileSync(DAMS_FILE, 'utf-8');
+            // Remove BOM if present
+            data = data.replace(/^\uFEFF/, '');
             cachedDams = JSON.parse(data);
         }
+        
+        console.log(`Successfully loaded ${cachedDams.length} dams`);
         return cachedDams;
     } catch (err) {
         console.error('Failed to load dam data', err);

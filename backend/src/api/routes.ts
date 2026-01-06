@@ -15,29 +15,55 @@ router.get('/questions', (req: Request, res: Response) => {
 
 // POST /api/diagnose
 router.post('/diagnose', (req: Request, res: Response) => {
-    const { answers } = req.body; // { answers: [{ questionId, choiceKey }] }
+    try {
+        const { answers } = req.body; // { answers: [{ questionId, choiceKey }] }
 
-    if (!answers || !Array.isArray(answers)) {
-        res.status(400).json({ error: 'Invalid input' });
-        return
+        if (!answers || !Array.isArray(answers)) {
+            console.error('Invalid answers format:', answers);
+            return res.status(400).json({ error: 'Invalid input', details: 'answers must be an array' });
+        }
+
+        console.log('Received answers:', answers);
+
+        // 1. Calculate Traits
+        const userTraits = computeUserTraits(answers);
+        console.log('Computed user traits:', userTraits);
+
+        // 2. Compute Tags
+        const typeTags = generateTypeTags(userTraits);
+        console.log('Generated tags:', typeTags);
+
+        // 3. Find Matching Dam
+        const allDams = loadDams();
+        console.log('Total dams loaded:', allDams.length);
+        
+        if (!allDams || allDams.length === 0) {
+            console.error('No dams data available');
+            return res.status(500).json({ error: 'No dam data available', details: 'Failed to load dams' });
+        }
+        
+        const { main, subs } = findMatchingDams(userTraits, allDams);
+        console.log('Matched dam:', main?.name_ja);
+
+        if (!main) {
+            console.error('No matching dam found');
+            return res.status(500).json({ error: 'Matching failed', details: 'Could not find matching dam' });
+        }
+
+        return res.json({
+            userTraits,
+            typeTags,
+            mainDam: main,
+            subDams: subs
+        });
+    } catch (error: any) {
+        console.error('Error in /api/diagnose:', error);
+        return res.status(500).json({ 
+            error: 'Internal server error', 
+            details: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
-
-    // 1. Calculate Traits
-    const userTraits = computeUserTraits(answers);
-
-    // 2. Compute Tags
-    const typeTags = generateTypeTags(userTraits);
-
-    // 3. Find Matching Dam
-    const allDams = loadDams();
-    const { main, subs } = findMatchingDams(userTraits, allDams);
-
-    return res.json({
-        userTraits,
-        typeTags,
-        mainDam: main,
-        subDams: subs
-    });
 });
 
 import { fetchRealtimeDamData } from '../data/realtime_scraper';

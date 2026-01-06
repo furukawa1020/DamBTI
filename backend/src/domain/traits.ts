@@ -55,9 +55,13 @@ export function findMatchingDams(userVec: TraitVector, allDams: DamData[]): { ma
     // Sort descending
     scored.sort((a, b) => b.score - a.score);
 
+    // Return top matches
+    const main = scored[0]?.dam;
+    const subs = scored.slice(1, 3).map(s => s.dam);
+    
     return {
-        main: scored[0].dam,
-        subs: scored.slice(1, 3).map(s => s.dam)
+        main: main || allDams[0], // Fallback to first dam if no match
+        subs: subs.length > 0 ? subs : allDams.slice(1, 3)
     };
 }
 

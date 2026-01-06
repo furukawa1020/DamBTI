@@ -40,25 +40,43 @@
   async function submitDiagnosis() {
     try {
       const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
+      console.log('API URL:', apiUrl);
+      console.log('Sending answers:', answers);
+      
       const res = await fetch(`${apiUrl}/api/diagnose`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answers }),
       });
       
+      console.log('Response status:', res.status);
+      console.log('Response ok:', res.ok);
+      
       if (!res.ok) {
-        throw new Error(`API error: ${res.status}`);
+        let errorDetails = '';
+        try {
+          const errorData = await res.json();
+          errorDetails = errorData.details || errorData.error || '';
+          console.error('Error response:', errorData);
+        } catch {
+          errorDetails = await res.text();
+          console.error('Error response:', errorDetails);
+        }
+        throw new Error(`API error: ${res.status} - ${errorDetails}`);
       }
       
       const data = await res.json();
+      console.log('Response data:', data);
+      
       if (data && data.mainDam) {
         resultData = data;
       } else {
+        console.error('Invalid data structure:', data);
         throw new Error('Invalid response data');
       }
     } catch (e) {
       console.error('診断エラー:', e);
-      alert('診断結果の取得に失敗しました。もう一度お試しください。');
+      alert(`診断結果の取得に失敗しました。もう一度お試しください。\n\nエラー: ${e.message}`);
     } finally {
       loading = false;
     }
