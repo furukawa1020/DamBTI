@@ -45,9 +45,20 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answers }),
       });
-      resultData = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      if (data && data.mainDam) {
+        resultData = data;
+      } else {
+        throw new Error('Invalid response data');
+      }
     } catch (e) {
-      console.error(e);
+      console.error('診断エラー:', e);
+      alert('診断結果の取得に失敗しました。もう一度お試しください。');
     } finally {
       loading = false;
     }

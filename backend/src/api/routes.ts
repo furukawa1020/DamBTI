@@ -10,7 +10,7 @@ router.get('/questions', (req: Request, res: Response) => {
     // Return questions without scoring effects to client? 
     // For simplicity, returning full object is verified safe as client needs IDs/Keys.
     // We might usually strip 'effects' but it's open logic anyway.
-    res.json(QUESTIONS);
+    return res.json(QUESTIONS);
 });
 
 // POST /api/diagnose
@@ -32,7 +32,7 @@ router.post('/diagnose', (req: Request, res: Response) => {
     const allDams = loadDams();
     const { main, subs } = findMatchingDams(userTraits, allDams);
 
-    res.json({
+    return res.json({
         userTraits,
         typeTags,
         mainDam: main,
@@ -46,7 +46,7 @@ import { fetchRealtimeDamData } from '../data/realtime_scraper';
 router.get('/dams', (req: Request, res: Response) => {
     const dams = loadDams();
     // 3000 items is ~1MB JSON, acceptable for single fetch on a "Database" page.
-    res.json(dams);
+    return res.json(dams);
 });
 
 // GET /api/dams/:id
@@ -60,7 +60,7 @@ router.get('/dams/:id', async (req: Request, res: Response) => {
     // Fetch Simulated Real-time data
     const realtime = await fetchRealtimeDamData(dam.name_ja);
 
-    res.json({
+    return res.json({
         ...dam,
         realtime: realtime || {}
     });

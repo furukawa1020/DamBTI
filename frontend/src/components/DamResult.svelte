@@ -50,22 +50,30 @@
       <!-- Real-time Status (Only if available) -->
       <div class="realtime-status">
         <h3>現在のダムの様子</h3>
-        {#if mainDam.realtime}
+        {#if mainDam.realtime && (mainDam.realtime.storagePercent !== undefined || mainDam.realtime.inflow !== undefined || mainDam.realtime.outflow !== undefined)}
           <div class="status-grid">
+            {#if mainDam.realtime.storagePercent !== undefined}
             <div class="status-item">
               <label>貯水率</label>
               <span class="value">{mainDam.realtime.storagePercent}%</span>
             </div>
+            {/if}
+            {#if mainDam.realtime.inflow !== undefined}
             <div class="status-item">
               <label>流入量</label>
               <span class="value">{mainDam.realtime.inflow} m³/s</span>
             </div>
+            {/if}
+            {#if mainDam.realtime.outflow !== undefined}
             <div class="status-item">
               <label>放流量</label>
               <span class="value">{mainDam.realtime.outflow} m³/s</span>
             </div>
+            {/if}
           </div>
+          {#if mainDam.realtime.time}
           <p class="timestamp">更新: {mainDam.realtime.time}</p>
+          {/if}
         {:else}
           <div class="no-data">
             <p>現在、リアルタイム情報は取得できません。</p>
